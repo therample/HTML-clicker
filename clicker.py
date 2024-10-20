@@ -1,4 +1,3 @@
-from flask import Flask, render_template, request
 import socket
 import asyncio
 import logging
@@ -20,25 +19,11 @@ dp = Dispatcher()
 async def cmd_start(message: types.Message):
     builder = InlineKeyboardBuilder()
     builder.row(types.InlineKeyboardButton(
-        text="tap ☝️", web_app=WebAppInfo(url=f"url_web_app"))
+        text="tap ☝️", web_app=WebAppInfo(url=f"url"))
     )
     await message.answer("Clicker HTML, sourse: https://github.com/ramplerrsky/HTML-clicker", reply_markup=builder.as_markup())
-#simple html clicker by: https://github.com/ramplerrsky/HTML-clicker
-app = Flask(__name__)
-#simple html clicker by: https://github.com/ramplerrsky/HTML-clicker
-@app.route('/')
-def index():
-    hostname = socket.gethostname()
-    local_ip = socket.gethostbyname(hostname)
-    return render_template('clicker.html', ip_address=local_ip)
-#simple html clicker by: https://github.com/ramplerrsky/HTML-clicker
-#simple html clicker by: https://github.com/ramplerrsky/HTML-clicker
-#simple html clicker by: https://github.com/ramplerrsky/HTML-clicker
 async def main():
     await dp.start_polling(bot)
-    loop = asyncio.get_event_loop()
-    loop.create_task(app.run(debug=True, use_reloader=False))
 #simple html clicker by: https://github.com/ramplerrsky/HTML-clicker
 if __name__ == '__main__':
     asyncio.run(main())
-#simple html clicker by: https://github.com/ramplerrsky/HTML-clicker
