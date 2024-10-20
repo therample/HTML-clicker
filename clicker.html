@@ -1,0 +1,424 @@
+<!--HTML CLICKER BY: https://github.com/ramplerrsky/HTML-clicker-->
+<!--MY FIRST PROJECT-->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кликер</title>
+<!--HTML CLICKER BY: https://github.com/ramplerrsky/HTML-clicker-->
+<!--MY FIRST PROJECT-->
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div id="startScreen" class="noselect">
+        <input type="text" id="nameInput" placeholder="Введите ваше имя">
+        <button id="submitName">Начать</button>
+    </div>
+    <div id="titleDisplay" class="noselect">Вы Новичок</div>
+    <h1 id="nameGame">RampleClicker</h1>
+    <audio id="myAudio" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/1120/1120-preview.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="myAudio2" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2575/2575-preview.mp3" type="audio/mpeg">
+    </audio>
+    <div id="clickArea" class="noselect">
+        0
+    </div>
+    <div class="progressBar">
+        <div class="progressBarFill" id="progressFill"></div>
+        <div class="progressBarText" id="progressText">0%</div>
+    </div>
+    <!--HTML CLICKER BY: https://github.com/ramplerrsky/HTML-clicker-->
+<!--MY FIRST PROJECT-->
+<style>
+#canvas, #text {
+	position: absolute;
+	display: block;
+	top: 0;
+	left: 0;
+	z-index: -1;
+    filter: drop-shadow(0 0 100px #555);
+}
+#text {
+  min-height: 100vh;
+  width: 100vw;
+  z-index: 1;
+  color: #bd2020;
+  text-transform: uppercase;
+  font-size: 8vmin;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  filter: drop-shadow(0 0 40px #555);
+}
+            .noselect {
+  -webkit-touch-callout: none;
+    -webkit-user-select: none; 
+     -khtml-user-select: none;
+       -moz-user-select: none; 
+        -ms-user-select: none; 
+            user-select: none; 
+}
+        #nameGame{
+            filter: drop-shadow(0 0 40px #555);
+            position: relative;
+            bottom:100px;
+            font-family: "MultiRound Pro";
+        }
+        body {
+            animation: fadeIn 0.5s ease-in-out; 
+            filter: drop-shadow(0 0 40px #555);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #1e1e1e;
+            color: white;
+            font-family: Arial, sans-serif;
+            flex-direction: column;
+            overflow: hidden;
+            -webkit-touch-callout: none;
+    -webkit-user-select: none; 
+     -khtml-user-select: none; 
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none; 
+        }
+        #startScreen, #mainScreen {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            width: 100%;
+        }
+        #titleDisplay{
+            position: relative;
+            bottom: 20px;
+            font-family: "MultiRound Pro";
+        }
+        #nameInput {
+            padding: 15px 30px;
+            font-size: 24px;
+            border: none;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            background-color: #282828;
+            color: white;
+        }
+        .animation {
+    font-size: 2em;
+    color: rgb(255, 255, 255);
+    pointer-events: none;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+    position: absolute;
+    font-family: "MultiRound Pro";
+}
+
+        #clickArea {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background-color: #007bff;
+            position: relative;
+            font-size: 24px;
+            color: white;
+            text-align: center;
+            line-height: 200px;
+            user-select: none;
+            transition: 0.3s;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent; 
+            font-family: "MultiRound Pro";
+        }
+        #clickArea:hover {
+            background-color: #278fff;
+            box-shadow: 0 0 20px rgb(86, 97, 255);
+        }
+        #clickArea:active {
+          transform: scale(1.1);
+        }
+        @font-face {
+	font-family: 'Multiround Pro'; 
+	src: url("/Multiround Pro.otf");
+}
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8); 
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+        .progressBar {
+            width: 100%;
+            height: 10px;
+            background-color: #333;
+            border-radius: 5px;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+            position: relative;
+            bottom: -20px;
+        }
+        .progressBarFill {
+            height: 100%;
+            background-color: #007bff;
+            width: 0%;
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+</style>
+
+<script>
+//HTML CLICKER BY: https://github.com/ramplerrsky/HTML-clicker
+//MY FIRST PROJECT
+let count = 0;
+const audio = document.getElementById('myAudio');
+const clickArea = document.getElementById('clickArea');
+const nameInput = document.getElementById('nameInput');
+const submitNameButton = document.getElementById('submitName');
+const audio2 = document.getElementById('myAudio2');
+
+window.onload = () => {
+    const username = localStorage.getItem('userName');
+    if (username) {
+        loadClicks(username);
+        document.getElementById('startScreen').style.display = 'none';
+        clickArea.style.display = 'block';
+        document.querySelector('.progressBar').style.display = 'block'; 
+    }
+};
+
+submitNameButton.addEventListener('click', () => {
+    const username = nameInput.value.trim();
+    if (username) {
+        localStorage.setItem('userName', username);
+        loadClicks(username);
+        document.getElementById('startScreen').style.display = 'none';
+        clickArea.style.display = 'block';
+        document.querySelector('.progressBar').style.display = 'block'; 
+    } else {
+        alert('Пожалуйста, введите ваше имя!');
+    }
+});
+
+function loadClicks() {
+    const username = localStorage.getItem('userName'); 
+    const savedClicks = localStorage.getItem(username); 
+    count = savedClicks ? parseInt(savedClicks) : 0; 
+    updateDisplay();
+}
+
+function saveClicks(username) {
+    localStorage.setItem(username, count);
+}
+
+let previousTitle = '';
+
+function incrementAndPlaySound() {
+    count + 1;
+    const username = localStorage.getItem('userName');
+    audio.currentTime = 0; 
+    audio.play().catch(error => console.error("Ошибка воспроизведения:", error));
+    saveClicks(username); 
+    updateDisplay();
+}
+
+function updateDisplay() {
+    clickArea.textContent = count;
+    let title = '';
+    let nextLevelThreshold;
+
+    if (count < 100) {
+        title = 'Вы Новичок';
+        nextLevelThreshold = 100;
+        
+    } else if (count < 500) {
+        title = 'Вы Хороший игрок';
+        nextLevelThreshold = 500;
+    } else if (count < 1000) {
+        title = 'Вы Опытный игрок';
+        nextLevelThreshold = 1000;
+    } else if (count < 1500) {
+        title = 'Вы Мастер';
+        nextLevelThreshold = 1500;
+    } else {
+        title = 'Вы Миллиардер';
+        nextLevelThreshold = Math.floor(count / 100) * 100 + 100; // Каждые 100 снизу
+    }
+
+    if (title !== previousTitle) {
+        audio2.currentTime = 0; 
+        audio2.play().catch(error => console.error("Ошибка воспроизведения:", error));
+        previousTitle = title;
+    }
+
+    const progressValue = Math.min((count / nextLevelThreshold) * 100, 100); 
+
+    document.getElementById('progressFill').style.width = progressValue + '%';
+    document.getElementById('progressText').textContent = Math.floor(progressValue) + '%';
+    
+    document.getElementById('titleDisplay').textContent = title;
+}
+
+window.onload = function() {
+    loadClicks();
+};
+
+
+
+clickArea.addEventListener('click', (e) => {
+    count++; 
+    incrementAndPlaySound();
+    createAnimation(e.clientX, e.clientY);
+});
+clickArea.addEventListener('dblclick', function() {
+    count++; 
+    incrementAndPlaySound(); 
+    createAnimation(e.clientX, e.clientY); 
+});
+
+function createAnimation(x, y) {
+    const plusOne = document.createElement('div');
+    plusOne.className = 'animation';
+    plusOne.innerText = '+1';
+    plusOne.style.position = 'absolute';
+    plusOne.style.left = x + 'px';
+    plusOne.style.top = y + 'px';
+    document.body.appendChild(plusOne);
+
+    setTimeout(() => {
+        plusOne.style.transform = 'translateY(-50px)';
+        plusOne.style.opacity = '0';
+    }, 10);
+    setTimeout(() => {
+        plusOne.remove();
+    }, 500);
+}
+let resizeReset = function() {
+	w = canvasBody.width = window.innerWidth;
+	h = canvasBody.height = window.innerHeight;
+}
+
+const opts = { 
+	particleColor: "rgb(0,95,158)",
+	lineColor: "rgb(66,183,255)",
+	particleAmount: 30,
+	defaultSpeed: 1,
+	variantSpeed: 1,
+	defaultRadius: 2,
+	variantRadius: 2,
+	linkRadius: 200,
+};
+//HTML CLICKER BY: https://github.com/ramplerrsky/HTML-clicker
+//MY FIRST PROJECT
+window.addEventListener("resize", function(){
+	deBouncer();
+});
+
+let deBouncer = function() {
+    clearTimeout(tid);
+    tid = setTimeout(function() {
+        resizeReset();
+    }, delay);
+};
+
+let checkDistance = function(x1, y1, x2, y2){ 
+	return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+};
+
+let linkPoints = function(point1, hubs){ 
+	for (let i = 0; i < hubs.length; i++) {
+		let distance = checkDistance(point1.x, point1.y, hubs[i].x, hubs[i].y);
+		let opacity = 1 - distance / opts.linkRadius;
+		if (opacity > 0) { 
+			drawArea.lineWidth = 0.5;
+			drawArea.strokeStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${opacity})`;
+			drawArea.beginPath();
+			drawArea.moveTo(point1.x, point1.y);
+			drawArea.lineTo(hubs[i].x, hubs[i].y);
+			drawArea.closePath();
+			drawArea.stroke();
+		}
+	}
+}
+
+Particle = function(xPos, yPos){ 
+	this.x = Math.random() * w; 
+	this.y = Math.random() * h;
+	this.speed = opts.defaultSpeed + Math.random() * opts.variantSpeed; 
+	this.directionAngle = Math.floor(Math.random() * 360); 
+	this.color = opts.particleColor;
+	this.radius = opts.defaultRadius + Math.random() * opts. variantRadius; 
+	this.vector = {
+		x: Math.cos(this.directionAngle) * this.speed,
+		y: Math.sin(this.directionAngle) * this.speed
+	};
+	this.update = function(){ 
+		this.border(); 
+		this.x += this.vector.x; 
+		this.y += this.vector.y; 
+	};
+	this.border = function(){ 
+		if (this.x >= w || this.x <= 0) { 
+			this.vector.x *= -1;
+		}
+		if (this.y >= h || this.y <= 0) {
+			this.vector.y *= -1;
+		}
+		if (this.x > w) this.x = w;
+		if (this.y > h) this.y = h;
+		if (this.x < 0) this.x = 0;
+		if (this.y < 0) this.y = 0;	
+	};
+	this.draw = function(){ 
+		drawArea.beginPath();
+		drawArea.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+		drawArea.closePath();
+		drawArea.fillStyle = this.color;
+		drawArea.fill();
+	};
+};
+
+function setup(){ 
+	particles = [];
+	resizeReset();
+	for (let i = 0; i < opts.particleAmount; i++){
+		particles.push( new Particle() );
+	}
+	window.requestAnimationFrame(loop);
+}
+
+function loop(){ 
+	window.requestAnimationFrame(loop);
+	drawArea.clearRect(0,0,w,h);
+	for (let i = 0; i < particles.length; i++){
+		particles[i].update();
+		particles[i].draw();
+	}
+	for (let i = 0; i < particles.length; i++){
+		linkPoints(particles[i], particles);
+	}
+}
+
+const canvasBody = document.getElementById("canvas"),
+drawArea = canvasBody.getContext("2d");
+let delay = 200, tid,
+rgb = opts.lineColor.match(/\d+/g);
+resizeReset();
+setup();
+</script>
+<!--HTML CLICKER BY: https://github.com/ramplerrsky/HTML-clicker-->
+<!--MY FIRST PROJECT-->
+<!--HTML CLICKER BY: https://github.com/ramplerrsky/HTML-clicker-->
+<!--MY FIRST PROJECT-->
+</body>
+</html>
